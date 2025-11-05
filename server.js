@@ -122,8 +122,11 @@ app.put('/api/location/:id', (req, res) => {
 
 app.get('/api/export', basicAuth, (req, res) => {
   const rows = readDB();
-  const header = 'id,location,created_at\n';
-  const csv = rows.map(r => `${r.id},"${r.location.replace(/"/g, '""')}",${r.created_at}`).join('\n');
+  const header = 'id,location,date\n';
+  const csv = rows.map(r => {
+    const date = new Date(r.created_at).toISOString().split('T')[0];
+    return `${r.id},"${r.location.replace(/"/g, '""')}",${date}`;
+  }).join('\n');
   const out = header + csv;
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename="locations.csv"');
